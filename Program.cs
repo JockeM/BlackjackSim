@@ -1,9 +1,15 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
 
+using System.Diagnostics;
+
 var logger = new NullLogger();
 
-var plays = Enumerable.Range(1, 1_000_000)
+var stopwatch = new Stopwatch();
+stopwatch.Start();
+
+var plays = Enumerable.Range(1, 10_000_000)
+	.AsParallel()
 	.Select(_ =>
 	{
 		var game = new BlackjackGame(logger);
@@ -30,6 +36,9 @@ foreach (var play in plays)
 	}
 }
 
+stopwatch.Stop();
+Console.WriteLine($"Sim time: {stopwatch.ElapsedMilliseconds}");
+Console.WriteLine();
 Console.WriteLine($"Player wins: {playerWins}");
 Console.WriteLine($"Dealer wins: {dealerWins}");
 Console.WriteLine($"Pushs: {pushs}");

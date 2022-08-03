@@ -31,7 +31,7 @@ public class Deck
 		return card;
 	}
 
-	public static Deck CreateNormalDeck()
+	private static Lazy<List<Card>> _normalDeck = new Lazy<List<Card>>(() =>
 	{
 		const int NormalDeckCount = 52;
 		var cards = new List<Card>(NormalDeckCount);
@@ -43,7 +43,8 @@ public class Deck
 				cards.Add(new Card(suit, rank));
 			}
 		}
+		return cards;
+	});
 
-		return new Deck(cards);
-	}
+	public static Deck CreateNormalDeck() => new Deck(new List<Card>(_normalDeck.Value));
 }
