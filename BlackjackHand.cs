@@ -3,9 +3,12 @@ using PlayingDeck;
 public class Hand
 {
 	private readonly List<Card> _cards;
+	public IReadOnlyList<Card> Cards => _cards;
+
 	public Hand(IEnumerable<Card>? cards = null) => _cards = cards?.ToList() ?? new List<Card>();
 
 	public void Add(Card card) => _cards.Add(card);
+	public void Clear() => _cards.Clear();
 
 	public IEnumerable<int> GetPossibleHandValues()
 	{

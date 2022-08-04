@@ -1,6 +1,8 @@
 using PlayingDeck;
 using Xunit;
 
+namespace BlackjackSim.Tests;
+
 public class BlackjackHandTests
 {
 	Hand Hand(params Rank[] ranks) => new Hand(ranks.Select(x => new Card(Suit.Clubs, x)));
