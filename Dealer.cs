@@ -4,6 +4,5 @@ using PlayingDeck;
 
 public class AutomaticDealer
 {
-	public Hand Hand { get; } = new();
+    public Hand Hand { get; } = new();
 }
-

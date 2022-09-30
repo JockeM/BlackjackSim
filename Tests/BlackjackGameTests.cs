@@ -4,9 +4,6 @@ namespace BlackjackSim.Tests;
 
 public class BlackjackGameTests
 {
-	[Fact]
-	public void TestName()
-	{
-
-	}
+    [Fact]
+    public void TestName() { }
 }

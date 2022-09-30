@@ -3,9 +3,9 @@
 
 public enum PlayerChoice
 {
-	Hit,
-	Stand,
-	Split,
-	DoubleDown,
-	Surrnder,
+    Hit,
+    Stand,
+    Split,
+    DoubleDown,
+    Surrnder,
 }

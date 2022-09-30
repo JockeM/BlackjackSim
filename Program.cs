@@ -1,55 +1,56 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-using BlackjackSim;
+﻿using BlackjackSim;
 using System.Diagnostics;
 
 var basicStrategy = new BasicStrategy();
 var playerTactic = new PlayerTactic();
 
 Console.WriteLine("BasicStrategy");
-NewMethod(basicStrategy);
+Sim(basicStrategy);
 Console.WriteLine();
-Console.WriteLine("Shitty Player Stategy");
-NewMethod(playerTactic);
+Console.WriteLine("Shitty Player Strategy");
+Sim(playerTactic);
 
-static void NewMethod(IPlayerTactic tactic)
+static void Sim(IPlayerTactic tactic)
 {
-	var logger = new NullLogger();
+    var logger = new NullLogger();
 
-	var stopwatch = new Stopwatch();
-	stopwatch.Start();
+    var stopwatch = new Stopwatch();
+    stopwatch.Start();
 
-	var plays = Enumerable.Range(1, 1_000_000)
-		.AsParallel()
-		.Select(_ =>
-		{
-			var game = new BlackjackGame(logger, tactic);
-			return game.PlayRound();
-		});
+    const int Runs = 1_000_000;
 
-	int playerWins = 0;
-	int dealerWins = 0;
-	int pushs = 0;
+    var plays = Enumerable
+        .Range(1, Runs)
+        .AsParallel()
+        .Select(_ =>
+        {
+            var game = new BlackjackGame(logger, tactic);
+            return game.PlayRound();
+        });
 
-	foreach (var play in plays)
-	{
-		if (play is GameResult.PlayerWins)
-		{
-			playerWins++;
-		}
-		else if (play is GameResult.DealerWins)
-		{
-			dealerWins++;
-		}
-		else
-		{
-			pushs++;
-		}
-	}
+    int playerWins = 0;
+    int dealerWins = 0;
+    int pushs = 0;
 
-	stopwatch.Stop();
-	Console.WriteLine($"Sim time: {stopwatch.ElapsedMilliseconds}");
-	Console.WriteLine($"Player wins: {playerWins}");
-	Console.WriteLine($"Dealer wins: {dealerWins}");
-	Console.WriteLine($"Pushs: {pushs}");
+    foreach (var play in plays)
+    {
+        if (play is GameResult.PlayerWins)
+        {
+            playerWins++;
+        }
+        else if (play is GameResult.DealerWins)
+        {
+            dealerWins++;
+        }
+        else
+        {
+            pushs++;
+        }
+    }
+
+    stopwatch.Stop();
+    Console.WriteLine($"Sim time: {stopwatch.ElapsedMilliseconds}");
+    Console.WriteLine($"Player wins: {playerWins}");
+    Console.WriteLine($"Dealer wins: {dealerWins}");
+    Console.WriteLine($"Pushs: {pushs}");
 }

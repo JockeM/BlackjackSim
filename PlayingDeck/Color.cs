@@ -2,6 +2,6 @@
 
 public enum Color : byte
 {
-	Red,
-	Black,
+    Red,
+    Black,
 }

@@ -16,7 +16,7 @@ public class BlackjackGame
 
     private readonly AutomaticDealer _dealer = new();
     private readonly Player _player = new();
-    
+
     public BlackjackGame(ILogger logger, IPlayerTactic tactic)
     {
         var deck = Deck.CreateNormalDeck();
@@ -132,7 +132,6 @@ public class BlackjackGame
         }
     }
 }
-
 
 public enum GameResult
 {

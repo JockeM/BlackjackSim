@@ -1,13 +1,10 @@
-﻿// See https://aka.ms/new-console-template for more information
-
-
-using PlayingDeck;
+﻿using PlayingDeck;
 
 namespace BlackjackSim;
 
 public class BasicStrategy : IPlayerTactic
 {
-    public enum PlayerAction
+    enum StrategyActions
     {
         Hit,
         Stand,
@@ -18,61 +15,89 @@ public class BasicStrategy : IPlayerTactic
         Surrnder,
     }
 
-    static PlayerAction GetChoice(char c) => c switch
-    {
-        'H' => PlayerAction.Hit,
-        'S' => PlayerAction.Stand,
-        'D' => PlayerAction.DoubleDown,
-        'B' => PlayerAction.DoubleDownOrStand,
-        'Y' => PlayerAction.Split,
-        'F' => PlayerAction.Surrnder,
-        _ => throw new ArgumentException($"Invalid choice: {c}"),
-    };
+    static StrategyActions GetChoice(char c) =>
+        c switch
+        {
+            'H' => StrategyActions.Hit,
+            'S' => StrategyActions.Stand,
+            'D' => StrategyActions.DoubleDown,
+            'B' => StrategyActions.DoubleDownOrStand,
+            'Y' => StrategyActions.Split,
+            'F' => StrategyActions.Surrnder,
+            _ => throw new ArgumentException($"Invalid choice: {c}"),
+        };
 
-    static PlayerAction GetChoice(Rank rank, string s) => rank switch
+    static StrategyActions GetHardTotalAction(Rank rank, Hand hand)
     {
-        Rank.Ace => GetChoice(s[^1]),
-        Rank.King or Rank.Queen or Rank.Jack => GetChoice(s[^2]),
-        _ => GetChoice(s[(int)rank - 2]),
-    };
+        var value = hand.GetPossibleHandValues().Where(v => v is <= 21).Max();
+        if (value is >= 17)
+        {
+            return StrategyActions.Stand;
+        }
+        else if (value is <= 8)
+        {
+            return StrategyActions.Hit;
+        }
 
-    private static readonly Dictionary<int, string> StrategyMap = new()
-    {
-        {21, "SSSSSSSSSS"},
-        {20, "SSSSSSSSSS"},
-        {19, "SSSSSSSSSS"},
-        {18, "SSSSSSSSSS"},
-        {17, "SSSSSSSSSS"},
-        {16, "SSSSSHHHHH"},
-        {15, "SSSSSHHHHH"},
-        {14, "SSSSSHHHHH"},
-        {13, "SSSSSHHHHH"},
-        {12, "HHSSSHHHHH"},
-        {11, "DDDDDDDDDD"},
-        {10, "DDDDDDDDHH"},
-        {9,  "HDDDDHHHHH"},
-        {8,  "HHHHHHHHHH"},
-        {7,  "HHHHHHHHHH"},
-        {6,  "HHHHHHHHHH"},
-        {5,  "HHHHHHHHHH"},
-        {4,  "HHHHHHHHHH"},
-    };
+        var s = StrategyMap[value];
 
-    private PlayerChoice ToChoice(PlayerAction action) => action switch
-    {
-        PlayerAction.Hit => PlayerChoice.Hit,
-        PlayerAction.Stand => PlayerChoice.Stand,
-        PlayerAction.Split => PlayerChoice.Split,
-        PlayerAction.DoubleDown => PlayerChoice.Hit,
-        PlayerAction.DoubleDownOrStand => PlayerChoice.Stand,
-        PlayerAction.Surrnder => PlayerChoice.Stand,
-        _ => throw new ArgumentException($"Invalid choice: {action}"),
-    };
+        var c = rank switch
+        {
+            Rank.Ace => s[^1],
+            Rank.King or Rank.Queen or Rank.Jack => s[^2],
+            _ => s[(int)rank - 2],
+        };
 
-    public PlayerChoice GetPlayerChoice(Card dealerCard, Hand player)
+        return GetChoice(c);
+    }
+
+    private static readonly Dictionary<int, string> StrategyMap =
+        new()
+        {
+            { 16, "SSSSSHHHHH" },
+            { 15, "SSSSSHHHHH" },
+            { 14, "SSSSSHHHHH" },
+            { 13, "SSSSSHHHHH" },
+            { 12, "HHSSSHHHHH" },
+            { 11, "DDDDDDDDDD" },
+            { 10, "DDDDDDDDHH" },
+            { 9, "HDDDDHHHHH" },
+        };
+
+    static PlayerChoice ToChoice(StrategyActions action) =>
+        action switch
+        {
+            StrategyActions.Hit => PlayerChoice.Hit,
+            StrategyActions.Stand => PlayerChoice.Stand,
+            StrategyActions.Split => PlayerChoice.Split,
+            StrategyActions.DoubleDown => PlayerChoice.Hit,
+            StrategyActions.DoubleDownOrStand => PlayerChoice.Stand,
+            StrategyActions.Surrnder => PlayerChoice.Stand,
+            _ => throw new ArgumentException($"Invalid choice: {action}"),
+        };
+
+    static bool IsPair(Hand hand) => hand.Cards.GroupBy(x => x.Rank).Count() is 1;
+
+    static bool ContainsSingleAce(Hand hand) => hand.Cards.Count(x => x.Rank is Rank.Ace) is 1;
+
+    public PlayerChoice GetPlayerChoice(Card dealerCard, Hand playerHand)
     {
-        var value = player.GetPossibleHandValues().Where(v => v is <= 21).Max();
-        var action = GetChoice(dealerCard.Rank, StrategyMap[value]);
+        if (playerHand.Cards.Count is 2)
+        {
+            if (ContainsSingleAce(playerHand))
+            {
+                // TODO: Check ace strategy
+
+                return PlayerChoice.Hit;
+            }
+
+            if (IsPair(playerHand))
+            {
+                // TODO: Check pair strategy
+            }
+        }
+
+        var action = GetHardTotalAction(dealerCard.Rank, playerHand);
         return ToChoice(action);
     }
 }
