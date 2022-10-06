@@ -115,8 +115,8 @@ public class BlackjackGame
             return GameResult.DealerWins;
         }
 
-        var playerBest = player.GetPossibleHandValues().Where(v => v is <= 21).Max();
-        var dealerBest = dealer.GetPossibleHandValues().Where(v => v is <= 21).Max();
+        var playerBest = player.GetBestPossibleHandValue();
+        var dealerBest = dealer.GetBestPossibleHandValue();
 
         if (playerBest == dealerBest)
         {

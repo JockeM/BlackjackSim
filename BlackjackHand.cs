@@ -48,7 +48,9 @@ public class Hand
             }
         }
     }
-
+   
+    public int GetBestHandValue() => GetPossibleHandValues().Where(x => x is not > 21).Max();
+    
     public bool IsBlackjack() => _cards.Count is 2 && GetPossibleHandValues().Contains(21);
 
     public bool IsBust() => GetPossibleHandValues().All(x => x > 21);
